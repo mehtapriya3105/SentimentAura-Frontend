@@ -5,8 +5,9 @@ import { KeywordsDisplay } from "@/components/KeywordsDisplay";
 import { TranscriptDisplay } from "@/components/TranscriptDisplay";
 import { VerticalSentimentIndicator } from "@/components/VerticalSentimentIndicator";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Loader } from "@/components/Loader";
 import { useAudioTranscription } from "@/hooks/useAudioTranscription";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Index = () => {
   const { state, startRecording, stopRecording } = useAudioTranscription();
@@ -19,8 +20,18 @@ const Index = () => {
     }
   };
 
+  // Show loader when recording but not yet connected to Deepgram
+  const showLoader = state.isRecording && !state.isConnected;
+
   return (
     <div className="min-h-screen w-full bg-background">
+      {/* Loader overlay - shows until Deepgram connection is established */}
+      <AnimatePresence>
+        {showLoader && (
+          <Loader message={state.connectionStatus} />
+        )}
+      </AnimatePresence>
+
       <div className="relative z-10 max-w-5xl mx-auto px-[19.2px] py-8">
         {/* Header - Centered as earlier version */}
         <motion.header
