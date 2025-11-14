@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getDeepgramURL, processText } from "@/services/api";
+import { toast } from "sonner";
 
 export interface TranscriptionState {
   isConnected: boolean;
@@ -56,6 +57,45 @@ export function useAudioTranscription(): UseAudioTranscriptionReturn {
       setError(null);
     }
   };
+
+  // Check microphone permission on mount
+  useEffect(() => {
+    const checkMicrophonePermission = async () => {
+      try {
+        // Check if permission is already denied
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        
+        if (permissionStatus.state === 'denied') {
+          // Permission was previously denied (never allow)
+          setError("Microphone permission denied. Please enable it in your browser settings.");
+          setConnectionStatus("Microphone Permission Denied");
+          
+          // Show toast notification
+          toast.error("Microphone Access Required", {
+            description: "Please enable microphone access in your browser settings to use this feature.",
+            duration: 5000,
+          });
+        }
+        
+        // Listen for permission changes
+        permissionStatus.onchange = () => {
+          if (permissionStatus.state === 'granted') {
+            setError(null);
+            setConnectionStatus("Disconnected");
+          } else if (permissionStatus.state === 'denied') {
+            setError("Microphone permission denied. Please enable it in your browser settings.");
+            setConnectionStatus("Microphone Permission Denied");
+          }
+        };
+      } catch (err) {
+        // Permissions API might not be supported in all browsers
+        // This is okay, we'll handle it when user tries to record
+        console.log("Permissions API not fully supported:", err);
+      }
+    };
+    
+    checkMicrophonePermission();
+  }, []);
 
   const startRecording = async () => {
     if (isRecording) return; // Already recording
@@ -248,8 +288,34 @@ export function useAudioTranscription(): UseAudioTranscriptionReturn {
       };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      setError(errorMessage);
-      setConnectionStatus("Connection Failed");
+      
+      // Check if it's a permission error
+      if (err instanceof DOMException) {
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          const permissionError = "Microphone permission denied. Please enable it in your browser settings.";
+          setError(permissionError);
+          setConnectionStatus("Microphone Permission Denied");
+          
+          // Show toast notification
+          toast.error("Microphone Access Denied", {
+            description: "Please enable microphone access in your browser settings to record audio.",
+            duration: 6000,
+            action: {
+              label: "Learn More",
+              onClick: () => {
+                window.open("https://support.google.com/chrome/answer/2693767", "_blank");
+              }
+            }
+          });
+        } else {
+          setError(errorMessage);
+          setConnectionStatus("Connection Failed");
+        }
+      } else {
+        setError(errorMessage);
+        setConnectionStatus("Connection Failed");
+      }
+      
       setIsConnected(false);
       setIsRecording(false);
       cleanup();

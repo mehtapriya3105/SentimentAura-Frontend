@@ -8,6 +8,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Loader } from "@/components/Loader";
 import { useAudioTranscription } from "@/hooks/useAudioTranscription";
 import { motion, AnimatePresence } from "framer-motion";
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Index = () => {
   const { state, startRecording, stopRecording } = useAudioTranscription();
@@ -55,7 +57,8 @@ const Index = () => {
                 state.connectionStatus.includes("Connected") || state.connectionStatus.includes("Recording")
                   ? "bg-green-500/20 dark:bg-green-500/20 text-green-600 dark:text-green-400"
                   : state.connectionStatus.includes("Error") ||
-                    state.connectionStatus.includes("Failed")
+                    state.connectionStatus.includes("Failed") ||
+                    state.connectionStatus.includes("Permission Denied")
                   ? "bg-red-500/20 dark:bg-red-500/20 text-red-600 dark:text-red-400"
                   : "bg-gray-500/20 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400"
               }`}
@@ -64,8 +67,8 @@ const Index = () => {
             </div>
 
             {state.error && (
-              <div className="px-4 py-2 rounded-lg bg-red-500/20 dark:bg-red-500/20 text-red-600 dark:text-red-400 max-w-md">
-                Error: {state.error}
+              <div className="px-4 py-2 rounded-lg bg-red-500/20 dark:bg-red-500/20 text-red-600 dark:text-red-400 max-w-md text-center">
+                {state.error}
               </div>
             )}
           </div>
@@ -84,7 +87,7 @@ const Index = () => {
               />
             </div>
             <div className="flex-[0.7] min-h-0">
-              <KeywordsDisplay keywords={state.keywords} />
+              <KeywordsDisplay keywords={state.keywords} sentiment={state.sentiment} />
             </div>
           </div>
         </div>
@@ -96,9 +99,19 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl overflow-hidden flex-1"
           >
-            <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
-              Sentiment Visualization
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                Sentiment Visualization
+              </h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-4 h-4 text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors flex-shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Perlin noise visualization that changes color and form based on sentiment</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="w-full h-96 rounded-xl overflow-hidden">
               <PerlinAura sentiment={state.sentiment} keywords={state.keywords} transcript={state.transcript} />
             </div>
@@ -110,9 +123,19 @@ const Index = () => {
             animate={{ opacity: 1, x: 0 }}
             className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl overflow-hidden"
           >
-            <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider text-center">
-              Sentiment
-            </h2>
+            <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                Sentiment
+              </h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-4 h-4 text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors flex-shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Visual indicator showing current emotional sentiment with emoji</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <VerticalSentimentIndicator sentiment={state.sentiment} transcript={state.transcript} />
           </motion.div>
         </div>

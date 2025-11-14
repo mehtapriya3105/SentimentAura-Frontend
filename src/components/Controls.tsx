@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,23 +8,8 @@ interface ControlsProps {
 }
 
 export const Controls = ({ isRecording, onToggleRecording }: ControlsProps) => {
-  const [permissionDenied, setPermissionDenied] = useState(false);
-
-  const handleRecordingClick = async () => {
-    if (!isRecording) {
-      try {
-        // Request mic permission
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // Stop preview stream
-        setPermissionDenied(false);
-        onToggleRecording(); // Proceed to actual recording
-      } catch (err) {
-        console.error('Microphone permission denied:', err);
-        setPermissionDenied(true);
-      }
-    } else {
-      onToggleRecording(); // Stop recording
-    }
+  const handleRecordingClick = () => {
+    onToggleRecording();
   };
 
   return (
@@ -82,12 +66,6 @@ export const Controls = ({ isRecording, onToggleRecording }: ControlsProps) => {
             {isRecording ? 'Recording...' : 'Ready'}
           </span>
         </div>
-
-        {permissionDenied && (
-          <p className="text-sm text-destructive">
-            Microphone permission denied. Please enable it in your browser settings.
-          </p>
-        )}
       </div>
     </motion.div>
   );

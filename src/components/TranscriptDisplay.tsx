@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TranscriptDisplayProps {
   transcript: string[];
@@ -21,9 +23,19 @@ export const TranscriptDisplay = ({ transcript }: TranscriptDisplayProps) => {
       animate={{ opacity: 1, y: 0 }}
       className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl h-full flex flex-col"
     >
-      <h2 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
-        Live Transcript
-      </h2>
+      <div className="flex items-center gap-2 mb-4">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+          Live Transcript
+        </h2>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="w-4 h-4 text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Real-time transcription of your speech as you speak</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
       <div
         ref={scrollRef}
         className="h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent"
