@@ -163,9 +163,9 @@ export const VerticalSentimentIndicator = ({ sentiment, transcript }: VerticalSe
         // Using lerp factor of 0.1 to match visualization pointer interpolation speed
         currentDisplaySentiment = p.lerp(currentDisplaySentiment, targetSentiment, 0.1);
         
-        const indicatorWidth = p.width * 0.8;
+        const indicatorWidth = p.width * 0.6;
         const indicatorHeight = p.height * 0.85;
-        const indicatorX = (p.width - indicatorWidth) / 2;
+        const indicatorX = p.width * 0.25; // Shift right to make room for labels on left
         const indicatorY = p.height * 0.075;
         
         // Draw sentiment scale background (vertical gradient)
@@ -180,24 +180,51 @@ export const VerticalSentimentIndicator = ({ sentiment, transcript }: VerticalSe
           p.rect(indicatorX, y, indicatorWidth, indicatorHeight / 100);
         }
         
+        // Draw scale labels with emojis on the left side
+        const scaleLabels = [
+          { value: 1.0, emoji: '😄', label: '1.0' },
+          { value: 0.5, emoji: '🙂', label: '0.5' },
+          { value: 0.0, emoji: '😐', label: '0.0' },
+          { value: -0.5, emoji: '😕', label: '-0.5' },
+          { value: -1.0, emoji: '😢', label: '-1.0' },
+        ];
+        
+        scaleLabels.forEach(({ value, emoji, label }) => {
+          const labelY = p.map(value, -1, 1, indicatorY + indicatorHeight, indicatorY);
+          const labelX = indicatorX - 20; // Position to the left of the scale
+          
+          // Draw emoji
+          p.textAlign(p.RIGHT, p.CENTER);
+          p.textSize(16);
+          p.fill(255, 255, 255, 220);
+          p.text(emoji, labelX, labelY);
+          
+          // Draw value below emoji
+          p.textAlign(p.RIGHT, p.CENTER);
+          p.textSize(10);
+          p.fill(200, 200, 200, 200);
+          p.text(label, labelX, labelY + 12);
+        });
+        
         // Draw moving emoji based on smoothly interpolated sentiment
         // Map sentiment (-1 to 1) to vertical position (bottom to top)
         const emojiY = p.map(currentDisplaySentiment, -1, 1, indicatorY + indicatorHeight - 25, indicatorY + 25);
         const emojiColor = getSentimentColor(currentDisplaySentiment);
         const emoji = getSentimentEmoji(currentDisplaySentiment);
         
-        // Draw emoji background circle with glow
+        // Draw emoji background circle with glow (centered on the scale)
+        const scaleCenterX = indicatorX + indicatorWidth / 2;
         p.fill(emojiColor.r, emojiColor.g, emojiColor.b, 60);
-        p.circle(p.width / 2, emojiY, 55);
+        p.circle(scaleCenterX, emojiY, 55);
         
         p.fill(emojiColor.r, emojiColor.g, emojiColor.b, 220);
-        p.circle(p.width / 2, emojiY, 45);
+        p.circle(scaleCenterX, emojiY, 45);
         
         // Draw emoji text
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(32);
         p.fill(255, 255, 255, 255);
-        p.text(emoji, p.width / 2, emojiY);
+        p.text(emoji, scaleCenterX, emojiY);
       };
 
       p.windowResized = () => {

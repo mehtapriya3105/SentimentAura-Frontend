@@ -97,9 +97,9 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl overflow-hidden flex-1"
+            className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl flex-1"
           >
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 relative z-10">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
                 Sentiment Visualization
               </h2>
@@ -121,22 +121,24 @@ const Index = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl overflow-hidden"
+            className="backdrop-blur-xl bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl"
           >
-            <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
-                Sentiment
+            <div className="flex items-center justify-center gap-1.5 mb-4 relative z-10">
+              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                Sentiment Scale
               </h2>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Info className="w-4 h-4 text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors flex-shrink-0" />
+                  <Info className="w-3.5 h-3.5 text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors flex-shrink-0" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Visual indicator showing current emotional sentiment with emoji</p>
                 </TooltipContent>
               </Tooltip>
             </div>
-            <VerticalSentimentIndicator sentiment={state.sentiment} transcript={state.transcript} />
+            <div className="overflow-hidden">
+              <VerticalSentimentIndicator sentiment={state.sentiment} transcript={state.transcript} />
+            </div>
           </motion.div>
         </div>
 

@@ -104,7 +104,7 @@ export const KeywordsDisplay = ({ keywords, sentiment = 0 }: KeywordsDisplayProp
       animate={{ opacity: 1, y: 0 }}
       className="backdrop-blur-xl bg-card/40 dark:bg-card/40 border border-border/30 rounded-2xl p-6 shadow-2xl h-full flex flex-col"
     >
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-4 relative z-10">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           Key Topics
         </h2>
