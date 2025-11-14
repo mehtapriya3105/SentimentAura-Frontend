@@ -185,34 +185,22 @@ export const PerlinAura = ({ sentiment, keywords, transcript }: PerlinAuraProps)
           const x = i * barSpacing + (barSpacing - fixedBarWidth) / 2;
           const normalizedPos = i / numBars;
           
-          // Get sentiment for this position - start neutral, only color when sentiment is detected
+          // Use CURRENT sentiment (like the VerticalSentimentIndicator)
+          // All bars should reflect the current overall sentiment, synced with the emoji
+          // Only show bars that are within the speech progress (up to pointer position)
           let barSentiment = 0; // Default to neutral
-          if (segmentsCount > 0) {
-            // Only get sentiment if this position is within the actual speech range (up to pointer position)
-            // Bars beyond the current speech position should remain neutral
-            if (normalizedPos <= pointerPosition) {
-              // Smooth interpolation between segments for better color transitions
-              const exactIndex = normalizedPos * segmentsCount;
-              const lowerIndex = Math.floor(exactIndex);
-              const upperIndex = Math.ceil(exactIndex);
-              const t = exactIndex - lowerIndex;
-              
-              const lowerSentiment = segments[p.constrain(lowerIndex, 0, segmentsCount - 1)]?.sentiment || 0;
-              const upperSentiment = segments[p.constrain(upperIndex, 0, segmentsCount - 1)]?.sentiment || 0;
-              
-              // Interpolate between adjacent segments for smooth transitions
-              barSentiment = p.lerp(lowerSentiment, upperSentiment, t);
-            }
-            // If position is beyond current speech (pointer), barSentiment stays 0 (neutral)
+          if (normalizedPos <= pointerPosition) {
+            // Use the smoothly interpolated current sentiment (same as vertical indicator)
+            barSentiment = currentPointerSentiment;
           }
-          // If no segments, barSentiment stays 0 (neutral)
+          // Bars beyond the current speech position remain neutral (not yet spoken)
           
           // Calculate bar height with animation - ONLY height varies, width is always the same
           const baseHeight = 20 + Math.abs(barSentiment) * 80;
           const animation = p.sin(time * 2 + i * 0.1) * 15;
           const barHeight = Math.max(5, baseHeight + animation); // Minimum height to ensure visibility
           
-          // Get color based on sentiment with smooth transitions
+          // Get color based on current sentiment with smooth transitions
           const barColor = getSentimentColor(barSentiment);
           
           // Draw bar - EXACTLY same width for all bars (no variation)
